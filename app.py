@@ -50,7 +50,7 @@ def do_logout():
     """Logout user."""
 
     if CURR_USER_KEY in session:
-        session.pop(user.id)
+        session.pop(CURR_USER_KEY)
         return redirect("/login")
     else:
         return redirect(f"/login")
