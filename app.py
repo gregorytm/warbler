@@ -373,16 +373,28 @@ def homepage():
 @app.route('/users/add_like/<int:message_id>', methods=["POST"])
 def like_user(message_id):
     """add message to liked"""
-
-    if not g.user:
+    liked_message = Message.query.get_or_404(message_id)
+    if not g.user or liked_message.user == g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
+    
+    elif liked_message == g.user.likes.message_id:
+        flash("removed")
+        return redirect("/")
+    else:
+        g.user.likes.append(liked_message)
+        db.session.commit()
+        return redirect("/users")
 
-    liked_message = User.query.get(message_id)
-    g.user.likes.append(liked_message)
-    db.session.commit()
+    # @app.before_request
+    # def add_user_to_g():
+    # """If we're logged in, add curr user to Flask global."""
 
-    return redirect('/')
+    # if CURR_USER_KEY in session:
+    #     g.user = User.query.get(session[CURR_USER_KEY])
+
+    # else:
+    #     g.user = None
 
 
 # @app.route('/users/follow/<int:follow_id>', methods=['POST'])
