@@ -18,9 +18,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
-toolbar = DebugToolbarExtension(app)
+# app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+# app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
+# toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
@@ -238,7 +238,7 @@ def add_like(message_id):
     else:
         g.user.likes.append(liked_message)
 
-    db.search.commit()
+    db.session.commit()
 
     return redirect("/")
 
@@ -365,51 +365,6 @@ def homepage():
 
     else:
         return render_template('home-anon.html')
-
-
-#############################################################################
-# liking other users warblers
-
-@app.route('/users/add_like/<int:message_id>', methods=["POST"])
-def like_user(message_id):
-    """add message to liked"""
-    liked_message = Message.query.get_or_404(message_id)
-    if not g.user or liked_message.user == g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-    
-    elif liked_message == g.user.likes.message_id:
-        flash("removed")
-        return redirect("/")
-    else:
-        g.user.likes.append(liked_message)
-        db.session.commit()
-        return redirect("/users")
-
-    # @app.before_request
-    # def add_user_to_g():
-    # """If we're logged in, add curr user to Flask global."""
-
-    # if CURR_USER_KEY in session:
-    #     g.user = User.query.get(session[CURR_USER_KEY])
-
-    # else:
-    #     g.user = None
-
-
-# @app.route('/users/follow/<int:follow_id>', methods=['POST'])
-# def add_follow(follow_id):
-#     """Add a follow for the currently-logged-in user."""
-
-#     if not g.user:
-#         flash("Access unauthorized.", "danger")
-#         return redirect("/")
-
-#     followed_user = User.query.get_or_404(follow_id)
-#     g.user.following.append(followed_user)
-#     db.session.commit()
-
-#     return redirect(f"/users/{g.user.id}/following")
 
 
 ##############################################################################
